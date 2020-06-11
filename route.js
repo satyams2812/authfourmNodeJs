@@ -8,6 +8,8 @@ const passport = require('passport');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
+var nodemailer = require('nodemailer');
+
 
 routes.use(bodyparser.urlencoded({extended:true}));
 
@@ -39,6 +41,24 @@ const checkAuthenticated = function (req, res, next) {
         res.redirect('/login');
     }
 }
+
+
+
+let transporter = nodemailer.createTransport({
+    service : 'gmail',
+    secure:false,
+    port:25,
+    auth:{
+        user : 'satyamtesting2812@gmail.com',
+        pass: 'satyam@2812'
+    },
+    tis:{
+        rejectUnauthorized : false
+    }
+});
+
+
+
 
 
 mongoose.connect('mongodb+srv://first:satyam@2812@cluster0-ziri6.mongodb.net/userDB?retryWrites=true&w=majority',{
@@ -89,6 +109,29 @@ routes.post('/register',(req,res)=>{
                        }).save((err,data)=>{
                            if(err) throw err;
                            req.flash('success_message',"Registred Successfully.. Login To Continue");
+                        
+                        
+                           let HelperOptions = {
+                            from : '"Satyam Sharma" <satyamtesting2812@gmail.com',
+                            to : email,
+                            subject: 'Testing Message',
+                            text : 'Thanks For Registration on our site' 
+                        };
+
+  
+                        transporter.sendMail(HelperOptions,(err,info)=>{
+                             if(err){
+                          return console.log(err);
+                              }
+                   console.log("This Message Was Sent");
+                           console.log(info);
+
+})
+
+                          
+
+
+
                            res.redirect('/login');
                        });
                    })
